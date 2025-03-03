@@ -16,8 +16,10 @@ const todosSlice = createSlice({
     },
     updateTodo: (state, action) => {
       const { id, newText } = action.payload;
-      const todo = state.todos.find(todo => todo.id === id);
-      if (todo) todo.text = newText;
+      const index = state.todos.findIndex(todo => todo.id === id);
+      if (index !== -1) {
+        state.todos[index] = { ...state.todos[index], ...newText };
+      }
     },
   },
 });

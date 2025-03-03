@@ -10,10 +10,16 @@ const App = () => {
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [editingId, setEditingId] = useState(null);
 
-  const handleAddTodo = () => {
+  const handleAddOrUpdateTodo = () => {
     if (number.trim() && email.trim() && firstName.trim() && lastName.trim()) {
-      dispatch(addTodo({ id: Date.now(), number, email, firstName, lastName }));
+      if (editingId) {
+        dispatch(updateTodo({ id: editingId, newText: { number, email, firstName, lastName } }));
+        setEditingId(null);
+      } else {
+        dispatch(addTodo({ id: Date.now(), number, email, firstName, lastName }));
+      }
       setNumber('');
       setEmail('');
       setFirstName('');
@@ -21,10 +27,18 @@ const App = () => {
     }
   };
 
+  const handleEditTodo = (todo) => {
+    setEditingId(todo.id);
+    setFirstName(todo.firstName);
+    setLastName(todo.lastName);
+    setNumber(todo.number);
+    setEmail(todo.email);
+  };
+
   return (
     <div className="app-container">
       <div className="todo-form">
-      <input
+        <input
           type="text"
           value={firstName}
           onChange={e => setFirstName(e.target.value)}
@@ -37,7 +51,7 @@ const App = () => {
           placeholder="Familiya kiriting"
         />
         <input
-          type="nombers"
+          type="number"
           value={number}
           onChange={e => setNumber(e.target.value)}
           placeholder="Raqam kiriting"
@@ -48,22 +62,23 @@ const App = () => {
           onChange={e => setEmail(e.target.value)}
           placeholder="Email kiriting"
         />
-      
-        <button onClick={handleAddTodo}>Qo'shish</button>
+
+        <button onClick={handleAddOrUpdateTodo}>{editingId ? "Saqlash" : "Qo'shish"}</button>
       </div>
 
       <div className="todo-list">
         {todos.map(todo => (
           <div key={todo.id} className="todo-item">
             <div>
+              <img src="./assets/icon/icon.png" alt="" />
               <p><strong>Ism:</strong> {todo.firstName}</p>
               <p><strong>Familiya:</strong> {todo.lastName}</p>
               <p><strong>Raqam:</strong> {todo.number}</p>
               <p><strong>Email:</strong> {todo.email}</p>
             </div>
             <div>
-              <button onClick={() => dispatch(updateTodo({ id: todo.id, newText: 'Yangilangan' }))}>Update</button>
-              <button onClick={() => dispatch(deleteTodo(todo.id))}>Delete</button>
+              <button onClick={() => handleEditTodo(todo)}>Yangilash</button>
+              <button onClick={() => dispatch(deleteTodo(todo.id))}>O'chirish</button>
             </div>
           </div>
         ))}
